@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.env
+.VENV/
+VENV/
+env/
+WEIGHTS/  
+RESULTS/
+.DS_Store
+.idea/
+.vscode/
+coverage/
+htmlcov/
