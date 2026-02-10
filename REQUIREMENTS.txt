@@ -1,0 +1,33 @@
+# CORE WEB FRAMEWORK
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+python-multipart==0.0.9
+pydantic==2.6.1
+pydantic-settings==2.1.0
+
+# DEEP LEARNING (CPU/CUDA HANDLING IS TRICKY IN REQUIREMENTS, ASSUMING LINUX/CUDA 11.8)
+# IN PRODUCTION, USE --extra-index-url https://download.pytorch.org/whl/cu118
+torch>=2.1.0
+torchvision>=0.16.0
+numpy<2.0.0
+opencv-python-headless==4.9.0.80
+
+# IMAGE PROCESSING & METRICS
+Pillow==10.2.0
+scikit-image==0.22.0
+lpips==0.1.4
+
+# FACE RESTORATION SPECIFIC
+# WE MIGHT NEED TO INSTALL THESE FROM GITHUB DIRECTLY IN DOCKER OR SCRIPTS
+# BUT FOR NOW LISTING PACKAGES
+basicsr>=1.4.2
+facexlib>=0.3.0
+gfpgan>=1.3.8
+realesrgan>=0.3.0
+insightface>=0.7.3
+onnxruntime-gpu>=1.17.0  # OR onnxruntime FOR CPU
+
+# UTILITIES
+requests==2.31.0
+tqdm==4.66.1
+aiofiles==23.2.1
