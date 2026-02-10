@@ -1,8 +1,8 @@
 import numpy as np
 import insightface
 from insightface.app import FaceAnalysis
-from app.core.logging import logger
-from app.models.base import BaseModel
+from APP.CORE.logging import logger
+from APP.MODELS.base import BaseModel
 
 class InsightFaceWrapper(BaseModel):
     def __init__(self, model_name: str, device: str):

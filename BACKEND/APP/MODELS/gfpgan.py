@@ -2,8 +2,8 @@ import os
 import torch
 import numpy as np
 from gfpgan import GFPGANer
-from app.core.logging import logger
-from app.models.base import BaseModel
+from APP.CORE.logging import logger
+from APP.MODELS.base import BaseModel
 
 class GFPGANWrapper(BaseModel):
     def load(self):
