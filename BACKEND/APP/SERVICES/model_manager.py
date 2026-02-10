@@ -1,3 +1,5 @@
+import torch
+import gc
 from APP.CORE.config import settings
 from APP.CORE.logging import logger
 from APP.MODELS.gfpgan import GFPGANWrapper
@@ -47,6 +49,26 @@ class ModelManager:
         self.insightface.load()
         
         logger.info("ALL MODELS LOADED AND READY.")
+    
+    def unload_all_models(self):
+        """
+        CLEARS MODELS FROM GPU MEMORY.
+        """
+        logger.info("UNLOADING MODELS...")
+        
+        # DELETE REFERENCES
+        self.gfpgan = None
+        self.realesrgan = None
+        self.insightface = None
+        
+        # FORCE GARBAGE COLLECTION
+        gc.collect()
+        
+        # CLEAR CUDA CACHE
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            
+        logger.info("GPU MEMORY CLEARED.")    
 
 # GLOBAL INSTANCE
 model_manager = ModelManager()
