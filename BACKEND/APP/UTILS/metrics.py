@@ -4,7 +4,7 @@ import lpips
 import numpy as np
 from skimage.metrics import structural_similarity as ssim_func
 from skimage.metrics import peak_signal_noise_ratio as psnr_func
-from APP.CPRE.config import settings
+from APP.CORE.config import settings
 from APP.SERVICES.image_utils import ImageUtils
 
 class MetricsCalculator:

@@ -3,16 +3,23 @@ from typing import List, Union
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
-    # API INFO
+    # =========================
+    # APP SETTINGS
+    # =========================
     PROJECT_NAME: str = "FACE ENHANCEMENT API"
     API_V1_STR: str = "/api/v1"
-    
+    DEBUG: bool = True
+
+    # =========================
     # CORS CONFIGURATION
-    # PARSES A COMMA-SEPARATED STRING INTO A LIST OF URLS
+    # PARSES COMMA-SEPARATED ORIGIN STRINGS INTO A LIST
+    # =========================
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
@@ -20,25 +27,48 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    # MODEL & HARDWARE SETTINGS
-    DEVICE: str = "cuda" if os.environ.get("CUDA_VISIBLE_DEVICES") else "cpu"
+    # =========================
+    # HARDWARE SETTINGS
+    # DEVICE CAN BE cpu OR cuda (SET VIA .env)
+    # =========================
+    DEVICE: str = os.environ.get("DEVICE", "cpu")
     GPU_ID: int = 0
-    
+
+    # =========================
     # MODEL PATHS
+    # RELATIVE TO PROJECT ROOT
+    # =========================
+    MODEL_DIR: str = "WEIGHTS"
     GFPGAN_MODEL_PATH: str = "WEIGHTS/GFPGANv1.3.pth"
     REALESRGAN_MODEL_PATH: str = "WEIGHTS/RealESRGAN_x4plus.pth"
-    INSIGHTFACE_MODEL_NAME: str = "antelopev2" # buffalo_l or antelopev2
     
+    # INSIGHTFACE MODEL
+    INSIGHTFACE_MODEL_NAME: str = "buffalo_l"
+
+    # =========================
     # PROCESSING LIMITS
-    MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB
+    # MAX UPLOAD SIZE IN MB (CONVERTED TO BYTES BELOW)
+    # =========================
+    MAX_UPLOAD_SIZE_MB: int = 10
     DEFAULT_UPSCALE_FACTOR: int = 2
 
-    # ENV FILE CONFIG
+    # DERIVED VALUE: CONVERT MB TO BYTES
+    @property
+    def MAX_UPLOAD_SIZE_BYTES(self) -> int:
+        return self.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
+    # =========================
+    # PYDANTIC SETTINGS CONFIG
+    # LOADS VARIABLES FROM .env
+    # extra="ignore" PREVENTS CRASHES FROM UNUSED VARIABLES
+    # =========================
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True
+        case_sensitive=True,
+        extra="ignore"
     )
 
-# INSTANTIATE SETTINGS ONCE
+
+# CREATE A SINGLE SETTINGS INSTANCE
 settings = Settings()
