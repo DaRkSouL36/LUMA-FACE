@@ -3,8 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.core.config import settings
-from app.core.logging import logger
+from APP.CORE.config import settings
+from APP.CORE.logging import logger
+from APP.API.V1.api import api_router
+from APP.SERVICES.model_manager import model_manager
 
 # -----------------------------------------------------------------------------
 # LIFESPAN CONTEXT MANAGER
@@ -21,7 +23,13 @@ async def lifespan(app: FastAPI):
     logger.info(f"STARTING UP {settings.PROJECT_NAME}...")
     logger.info(f"RUNNING ON DEVICE: {settings.DEVICE}")
     
-    model_manager.load_models()
+    try:
+        # FIXED: CORRECT METHOD NAME 
+        model_manager.load_all_models()
+    except Exception as e:
+        logger.critical(f"FAILED TO LOAD MODELS: {e}")
+        # WE DO NOT RAISE HERE TO ALLOW SERVER TO START SO WE CAN SEE LOGS,
+        # BUT ENDPOINTS WILL FAIL IF CALLED.
     
     logger.info("SYSTEM READY.")
     
@@ -29,8 +37,9 @@ async def lifespan(app: FastAPI):
     
     # --- SHUTDOWN LOGIC ---
     logger.info("SHUTTING DOWN...")
-    model_manager.unload_models()
-
+    # FIXED: ADDED METHOD IMPLEMENTATION IN STEP 1
+    model_manager.unload_all_models()
+    
 # -----------------------------------------------------------------------------
 # APP INITIALIZATION
 # -----------------------------------------------------------------------------
@@ -73,8 +82,9 @@ async def root():
     ROOT ENDPOINT.
     """
     return {
-        "message": f"Welcome to {settings.PROJECT_NAME}",
+        "message": f"WELCOME TO {settings.PROJECT_NAME}",
         "docs": "/docs"
     }
 
+# INCLUDE ROUTER
 app.include_router(api_router, prefix=settings.API_V1_STR)
