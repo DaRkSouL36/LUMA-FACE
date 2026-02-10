@@ -1,13 +1,59 @@
+# ==============================
+# PYTHON CACHE FILES
+# ==============================
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# ==============================
+# ENVIRONMENT VARIABLES
+# ==============================
 .env
+
+# ==============================
+# VIRTUAL ENVIRONMENTS
+# ==============================
 .VENV/
 VENV/
+venv/
 env/
-WEIGHTS/  
+
+# ==============================
+# MODEL WEIGHTS AND GENERATED FILES
+# LARGE FILES - SHOULD NOT BE PUSHED
+# ==============================
+WEIGHTS/
 RESULTS/
+gfpgan/
+
+# ==============================
+# OS-SPECIFIC FILES
+# ==============================
 .DS_Store
+Thumbs.db
+
+# ==============================
+# IDE / EDITOR SETTINGS
+# ==============================
 .idea/
 .vscode/
+
+# ==============================
+# TESTING AND COVERAGE REPORTS
+# ==============================
 coverage/
 htmlcov/
+.coverage
+.coverage.*
+
+# ==============================
+# LOG FILES
+# ==============================
+*.log
+
+# ==============================
+# TEMPORARY FILES
+# ==============================
+*.tmp
+*.temp
