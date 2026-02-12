@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
-/* IN TAILWIND V4, WE MUST MAP OUR CSS VARIABLES TO TAILWIND'S THEME 
-  USING THE @THEME BLOCK. THIS CREATES THE CLASSES AUTOMATICALLY.
-*/
+/* CONFIGURE TAILWIND V4 THEME VARIABLES */
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -25,9 +23,7 @@
   --color-ring: hsl(var(--ring));
 }
 
-/* NOW WE DEFINE THE ACTUAL VALUES FOR THE VARIABLES USED ABOVE.
-  NOTE: WE USE RAW HSL VALUES HERE BECAUSE WE WRAPPED THEM IN 'HSL()' ABOVE.
-*/
+/* SET VARIABLE VALUES */
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;
@@ -51,9 +47,6 @@
     --ring: 224.3 76.3% 48%;
     --radius: 0.5rem;
   }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
