@@ -7,7 +7,7 @@ import MetricsPanel from "./metrics-card";
 import { EnhancementResponse } from "@/TYPES/api";
 
 interface ResultViewerProps {
-  originalImage: string; // BLOB URL from Stage 8
+  originalImage: string; 
   result: EnhancementResponse;
   onReset: () => void;
 }
