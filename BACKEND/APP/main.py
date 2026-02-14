@@ -1,3 +1,5 @@
+import cv2  
+import numpy as np
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,14 +26,33 @@ async def lifespan(app: FastAPI):
     logger.info(f"RUNNING ON DEVICE: {settings.DEVICE}")
     
     try:
-        # LOADING MODELS (MOCK MODE WILL SKIP THIS INTERNALLY IF CONFIGURED)
-        # model_manager.load_all_models()
+        # LOADING MODELS
+        model_manager.load_all_models()
         pass
     except Exception as e:
         logger.critical(f"FAILED TO LOAD MODELS: {e}")
-        # WE DO NOT RAISE HERE TO ALLOW SERVER TO START SO WE CAN SEE LOGS,
-        # BUT ENDPOINTS WILL FAIL IF CALLED.
+        # WE DO NOT RAISE HERE TO ALLOW SERVER TO START SO WE CAN SEE LOGS
     
+    # --- WARMUP ROUTINE (OPTIMIZATION) ---
+    # RUNS A DUMMY IMAGE THROUGH THE PIPELINE TO INITIALIZE CUDA KERNELS
+    logger.info("WARMING UP MODELS...")
+    try:
+        # 1. CREATE A TINY DUMMY IMAGE (512x512 BLACK SQUARE)
+        dummy_img = np.zeros((512, 512, 3), dtype=np.uint8)
+        dummy_bytes = cv2.imencode('.jpg', dummy_img)[1].tobytes()
+        
+        # 2. RUN PIPELINE (SILENTLY IGNORE RESULT)
+        # IMPORT INSIDE FUNCTION TO AVOID CIRCULAR IMPORT ISSUES
+        from APP.SERVICES.pipeline import EnhancementPipeline
+        
+        # EXECUTE PIPELINE (THIS WILL TRIGGER MODEL COMPILATION/ALLOCATION)
+        # NOTE: THIS WILL RUN FAST IN MOCK_MODE, OR TAKE ~5S IN REAL MODE
+        EnhancementPipeline.process_image(dummy_bytes)
+        
+        logger.info("WARMUP COMPLETED. MODELS HOT.")
+    except Exception as e:
+        logger.warning(f"WARMUP FAILED (NON-CRITICAL): {e}")
+
     logger.info("SYSTEM READY.")
     
     yield
