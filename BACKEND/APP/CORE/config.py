@@ -68,6 +68,14 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore"
     )
+    
+    # MAX CONCURRENT GPU TASKS
+    # SET TO 1 FOR MOST CONSUMER GPUS (16GB VRAM OR LESS)
+    # SET TO 2+ ONLY IF YOU HAVE A 3090/4090 OR A100
+    MAX_CONCURRENT_REQUESTS: int = 1
+    
+    # MAX DIMENSION FOR INPUT IMAGES (PIXELS)
+    MAX_INPUT_DIMENSION: int = 2048
 
 
 # CREATE A SINGLE SETTINGS INSTANCE

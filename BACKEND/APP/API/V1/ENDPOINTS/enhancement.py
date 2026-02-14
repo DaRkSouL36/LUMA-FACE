@@ -1,4 +1,5 @@
 import time
+import asyncio
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 from fastapi.concurrency import run_in_threadpool
 
@@ -8,6 +9,11 @@ from APP.CORE.config import settings
 from APP.CORE.logging import logger
 
 router = APIRouter()
+
+# GLOBAL SEMAPHORE
+# WE INITIALIZE IT OUTSIDE THE ENDPOINT SO IT'S SHARED ACROSS REQUESTS
+# THIS LIMITS CONCURRENT GPU USAGE TO PREVENT OOM ERRORS
+request_semaphore = asyncio.Semaphore(settings.MAX_CONCURRENT_REQUESTS)
 
 @router.post(
     "/enhance",
@@ -22,6 +28,7 @@ async def enhance_image(
     """
     MAIN ENHANCEMENT ENDPOINT.
     HANDLES FILE UPLOAD, VALIDATION, AND PIPELINE EXECUTION.
+    INCLUDES CONCURRENCY CONTROL VIA SEMAPHORE.
     """
     start_time = time.time()
     logger.info(f"RECEIVED REQUEST: {file.filename}")
@@ -46,15 +53,19 @@ async def enhance_image(
         )
 
     try:
-        # 2. PROCESS IMAGE (NON-BLOCKING)
-        # WE USE RUN_IN_THREADPOOL TO PREVENT BLOCKING THE ASYNC EVENT LOOP
-        # THIS RUNS THE SYNCHRONOUS 'PROCESS_IMAGE' FUNCTION IN A WORKER THREAD
-        logger.info("OFFLOADING PIPELINE TO THREADPOOL...")
+        # 2. PROCESS IMAGE (NON-BLOCKING WITH CONCURRENCY CONTROL)
+        # WE USE A SEMAPHORE TO LIMIT CONCURRENT GPU TASKS.
+        # IF THE SEMAPHORE IS FULL, THIS LINE WILL WAIT HERE UNTIL A SLOT OPENS.
         
-        result = await run_in_threadpool(
-            EnhancementPipeline.process_image, 
-            image_bytes=file_bytes
-        )
+        async with request_semaphore:
+            logger.info(f"ACQUIRED GPU LOCK. PROCESSING IN THREADPOOL...")
+            
+            # WE USE RUN_IN_THREADPOOL TO PREVENT BLOCKING THE ASYNC EVENT LOOP
+            # THIS RUNS THE SYNCHRONOUS 'PROCESS_IMAGE' FUNCTION IN A WORKER THREAD
+            result = await run_in_threadpool(
+                EnhancementPipeline.process_image, 
+                image_bytes=file_bytes
+            )
 
         # 3. CALCULATE TIMING
         end_time = time.time()
@@ -82,5 +93,5 @@ async def enhance_image(
         logger.exception(f"INTERNAL SERVER ERROR: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred during image processing."
+            detail="AN ERROR OCCURRED DURING IMAGE PROCESSING."
         )
