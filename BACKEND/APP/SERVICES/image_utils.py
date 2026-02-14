@@ -3,6 +3,7 @@ import base64
 import numpy as np
 from PIL import Image
 import io
+from APP.CORE.config import settings
 
 class ImageUtils:
     @staticmethod
@@ -62,3 +63,22 @@ class ImageUtils:
         CONVERTS BGR (OPENCV) TO RGB (MATPLOTLIB/TORCH).
         """
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    
+    @staticmethod
+    def constrain_image_size(img: np.ndarray, max_dim: int = 2048) -> np.ndarray:
+        """
+        DOWNSCALES IMAGE IF IT EXCEEDS MAX_DIMENSION WHILE PRESERVING ASPECT RATIO.
+        PREVENTS GPU OOM ERRORS.
+        """
+        h, w = img.shape[:2]
+        
+        # IF IMAGE IS ALREADY SMALL ENOUGH, RETURN AS IS
+        if h <= max_dim and w <= max_dim:
+            return img
+            
+        # CALCULATE SCALE FACTOR
+        scale = max_dim / max(h, w)
+        new_w = int(w * scale)
+        new_h = int(h * scale)
+        
+        return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
