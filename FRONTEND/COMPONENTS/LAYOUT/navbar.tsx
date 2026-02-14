@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Cpu, Github } from "lucide-react";
+import { Cpu, Github, Linkedin } from "lucide-react"; // ADDED LINKEDIN ICON
 
 export default function Navbar() {
   return (
@@ -25,6 +25,15 @@ export default function Navbar() {
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <Github className="w-5 h-5" />
+            </a>
+            {/* LINKEDIN ADDED HERE */}
+            <a
+              href="https://www.linkedin.com/in/nextgenml/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Linkedin className="w-5 h-5" />
             </a>
           </div>
         </div>
