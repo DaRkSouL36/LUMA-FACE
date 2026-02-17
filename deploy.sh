@@ -32,10 +32,10 @@ fi
 # 3. BUILD AND RUN CONTAINERS
 echo "🐳 BUILDING CONTAINERS..."
 
-# CHECK IF docker-compose OR docker compose IS AVAILABLE
-if command -v docker-compose &> /dev/null; then
-    docker-compose down
-    docker-compose up --build -d
+# CHECK IF docker compose OR docker compose IS AVAILABLE
+if command -v docker compose &> /dev/null; then
+    docker compose down
+    docker compose up --build -d
 else
     # NEWER DOCKER VERSIONS USE 'docker compose' (NO HYPHEN)
     docker compose down

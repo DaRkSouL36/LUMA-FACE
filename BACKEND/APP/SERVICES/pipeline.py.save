@@ -1,0 +1,30 @@
+import numpy as np
+import cv2
+import logging
+import time
+
+from APP.CORE.config import settings
+from APP.SERVICES.model_manager import model_manager
+from APP.SERVICES.image_utils import ImageUtils
+from APP.UTILS.metrics import MetricsCalculator
+
+logger = logging.getLogger("face_enhancer")
+
+
+class EnhancementPipeline:
+    @staticmethod
+    def process_image(image_bytes: bytes) -> dict:
+        """
+        MAIN FACE ENHANCEMENT PIPELINE.
+        SYNCHRONOUS FUNCTION (CALLED INSIDE THREADPOOL).
+        """
+        start_time = time.time()
+        logger.info("--- STARTING PIPELINE ---")
+
+        try:
+            # ---------------------------------------------------------
+            # 1. DECODE IMAGE AND LIMIT SIZE
+            # ---------------------------------------------------------
+            original_img = ImageUtils.bytes_to_numpy(image_bytes)
+
+            # LIMIT MAX SIZE TO PR

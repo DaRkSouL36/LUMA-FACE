@@ -1,11 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import { ChevronsLeftRight } from "lucide-react";
 
 interface ImageComparisonProps {
-  beforeImage: string; // URL OR BASE64
-  afterImage: string; // BASE64
+  beforeImage: string; // ORIGINAL
+  afterImage: string;  // RESTORED
 }
 
 export default function ImageComparison({
@@ -17,41 +16,39 @@ export default function ImageComparison({
 
   return (
     <div className="relative w-full aspect-[4/5] md:aspect-video rounded-2xl overflow-hidden border-2 border-border shadow-2xl bg-black select-none group">
-      {/* 1. AFTER IMAGE (BACKGROUND LAYER - FULL WIDTH) */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      
+      {/* 1. ORIGINAL IMAGE (STATIONARY BACKGROUND) */}
       <img
-        src={afterImage}
-        alt="RESTORED RESULT"
+        src={beforeImage}
+        alt="ORIGINAL INPUT"
         className="absolute inset-0 w-full h-full object-contain pointer-events-none"
       />
 
-      {/* LABEL: RESTORED */}
-      <div className="absolute top-4 right-4 bg-black/50 backdrop-blur px-3 py-1 rounded text-xs font-bold text-white z-10 pointer-events-none transition-opacity group-hover:opacity-100 opacity-50">
-        RESTORED
+      {/* LABEL: ORIGINAL (Top Left) */}
+      <div className="absolute top-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded text-xs font-bold text-white z-10 pointer-events-none transition-opacity group-hover:opacity-100 opacity-50 uppercase">
+        Original
       </div>
 
-      {/* 2. BEFORE IMAGE (CLIPPED FOREGROUND LAYER) */}
-      {/* WE USE CLIP-PATH INSTEAD OF WIDTH SO THE IMAGE ITSELF NEVER RESIZES, ONLY ITS VISIBLE AREA CHANGES */}
+      {/* 2. RESTORED IMAGE (REVEALING FOREGROUND) */}
       <div
         className="absolute inset-0 w-full h-full"
         style={{
           clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={beforeImage}
-          alt="ORIGINAL INPUT"
+          src={afterImage}
+          alt="RESTORED RESULT"
           className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
 
-        {/* LABEL: ORIGINAL */}
-        <div className="absolute top-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded text-xs font-bold text-white z-10 pointer-events-none transition-opacity group-hover:opacity-100 opacity-50">
-          ORIGINAL
+        {/* LABEL: RESTORED (Top Right - BACK WHERE YOU WANTED IT) */}
+        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur px-3 py-1 rounded text-xs font-bold text-white z-10 pointer-events-none transition-opacity group-hover:opacity-100 opacity-50 uppercase">
+          Restored
         </div>
       </div>
 
-      {/* 3. SLIDER HANDLE (VISUAL ONLY) */}
+      {/* 3. SLIDER HANDLE */}
       <div
         className="absolute top-0 bottom-0 w-1 bg-white z-20 shadow-[0_0_10px_rgba(0,0,0,0.5)] pointer-events-none"
         style={{ left: `${sliderPosition}%` }}
@@ -63,7 +60,7 @@ export default function ImageComparison({
         </div>
       </div>
 
-      {/* 4. INTERACTIVE RANGE INPUT (INVISIBLE OVERLAY) */}
+      {/* 4. INVISIBLE SLIDER OVERLAY */}
       <input
         type="range"
         min="0"
